@@ -1,0 +1,6 @@
+ip addr add 169.254.169.254/24 dev lo
+systemctl start mdserver
+systemctl status mdserver
+systemctl start libvirtd
+systemctl status libvirtd
+virt-manager

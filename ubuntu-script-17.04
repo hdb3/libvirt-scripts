@@ -1,0 +1,48 @@
+#!/bin/bash -ex
+LIBVIRTVER=3.6.0
+GLIBVER=1.0.0
+LVPYTHONVER=3.8.0
+VIRTMANVER=1.4.3
+QEMUVER=2.10.1
+# libvirt
+wget http://libvirt.org/sources/libvirt-${LIBVIRTVER}.tar.xz -q -O- | tar Jx
+pushd libvirt-${LIBVIRTVER}
+sudo apt -y install libyajl-dev libxml2-dev libdevmapper-dev libpciaccess-dev libnl-3-dev libnetcf-dev libnl-route-3-dev xsltproc pkg-config
+sudo ldconfig
+./configure --prefix=/usr
+make -j 2
+sudo make install
+popd
+
+# libvirt-glib
+wget https://libvirt.org/sources/glib/libvirt-glib-${GLIBVER}.tar.gz -q -O- | tar zx
+pushd libvirt-glib-${GLIBVER}
+# sudo apt -y install gobject-introspection libgirepository1.0-dev libgtk-3-dev gir1.2-gtk-vnc gir1.2-spice-client-gtk libosinfo-1.0 python-ipaddr gir1.2-vte python-libxml2 python-requests intltool
+sudo apt -y install gobject-introspection libgirepository1.0-dev libgtk-3-dev gir1.2-gtk-vnc gir1.2-spice-client-gtk libosinfo-1.0 python-ipaddr libvte-2.91-dev python-libxml2 python-requests intltool
+./configure --prefix=/usr --with-python --enable-introspection
+make
+sudo make install
+popd
+# libvirt-python
+wget http://libvirt.org/sources/python/libvirt-python-${LVPYTHONVER}.tar.gz -q -O- | tar zx
+pushd libvirt-python-${LVPYTHONVER}
+sudo apt -y install python-dev python-gi
+sudo python setup.py install
+popd
+# virt-manager
+wget https://github.com/virt-manager/virt-manager/archive/v${VIRTMANVER}.tar.gz -q -O- | tar zx
+pushd virt-manager-${VIRTMANVER}
+sudo apt -y install libgtk2.0-bin
+sudo python setup.py install
+popd
+# qemu/kvm
+#wget http://wiki.qemu-project.org/download/qemu-${QEMUVER}.tar.bz2 -q -O- | tar jx
+wget https://download.qemu.org/qemu-${QEMUVER}.tar.xz -q -O- | tar Jx
+pushd qemu-${QEMUVER}
+sudo apt update
+sudo apt-get build-dep qemu -y
+sudo apt -y install libbz2-dev libibverbs-dev librbd-dev librdmacm-dev libsnappy-dev libssh2-1-dev libvde-dev libvdeplug-dev libvte-2.91-dev liblzo2-dev valgrind libnfs-dev libiscsi-dev
+./configure --prefix=/usr --target-list=x86_64-softmmu
+make -j 2
+sudo make install
+popd

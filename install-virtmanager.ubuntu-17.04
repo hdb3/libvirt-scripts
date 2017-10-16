@@ -1,0 +1,15 @@
+#!/bin/bash -ex
+git clone https://bitbucket.org/xchandan/md_server
+pushd md_server
+sudo python setup.py install
+popd
+# add your personal pub key to the mdserver conf file
+sudo vi /etc/mdserver/mdserver.conf
+sudo apt install python-bottle
+# this may be needed to add e.g. dns entries in the default network
+sudo virsh net-edit default
+sudo apt install ebtables
+# add the current Centos cloud image as a local image
+wget http://cloud.centos.org/centos/7/images/CentOS-7-x86_64-GenericCloud-1708.qcow2.xz
+xzcat CentOS-7-x86_64-GenericCloud-1708.qcow2.xz > CentOS-7-x86_64-GenericCloud-1708.qcow2
+
